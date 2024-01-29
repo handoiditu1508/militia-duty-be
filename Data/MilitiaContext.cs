@@ -94,6 +94,5 @@ namespace MilitiaDuty.Data
                     }
                 );
         }
-        public DbSet<MilitiaDuty.Models.Assignments.Shift> Shift { get; set; } = default!;
     }
 }

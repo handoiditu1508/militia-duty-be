@@ -20,14 +20,14 @@ namespace MilitiaDuty.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Shift>>> GetShift()
         {
-            return await _context.Shift.ToListAsync();
+            return await _context.Shifts.ToListAsync();
         }
 
         // GET: api/Shifts/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Shift>> GetShift(ulong id)
         {
-            var shift = await _context.Shift.FindAsync(id);
+            var shift = await _context.Shifts.FindAsync(id);
 
             if (shift == null)
             {
@@ -73,7 +73,7 @@ namespace MilitiaDuty.Controllers
         [HttpPost]
         public async Task<ActionResult<Shift>> PostShift(Shift shift)
         {
-            _context.Shift.Add(shift);
+            _context.Shifts.Add(shift);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetShift), new { id = shift.Id }, shift);
@@ -83,13 +83,13 @@ namespace MilitiaDuty.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteShift(ulong id)
         {
-            var shift = await _context.Shift.FindAsync(id);
+            var shift = await _context.Shifts.FindAsync(id);
             if (shift == null)
             {
                 return NotFound();
             }
 
-            _context.Shift.Remove(shift);
+            _context.Shifts.Remove(shift);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -97,7 +97,7 @@ namespace MilitiaDuty.Controllers
 
         private bool ShiftExists(ulong id)
         {
-            return _context.Shift.Any(e => e.Id == id);
+            return _context.Shifts.Any(e => e.Id == id);
         }
     }
 }
