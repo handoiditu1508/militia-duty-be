@@ -1,4 +1,5 @@
 ﻿using MilitiaDuty.Models.DutyDates;
+using MilitiaDuty.Models.Rules;
 
 namespace MilitiaDuty.Models.Militias
 {
@@ -10,5 +11,6 @@ namespace MilitiaDuty.Models.Militias
         public MilitiaStatus Status { get; set; }
 
         public virtual ICollection<DutyDate> DutyDates { get; set; } = new List<DutyDate>();
+        public virtual ICollection<Rule> Rules { get; set; } = new List<Rule>();
     }
 }

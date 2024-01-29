@@ -2,7 +2,7 @@
 {
     public class MilitiaRule
     {
-        public int MilitiaId { get; set; }
-        public int RuleId { get; set; }
+        public uint MilitiaId { get; set; }
+        public uint RuleId { get; set; }
     }
 }

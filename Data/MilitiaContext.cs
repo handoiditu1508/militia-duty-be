@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MilitiaDuty.Models.DutyDates;
 using MilitiaDuty.Models.Militias;
+using MilitiaDuty.Models.Rules;
 
 namespace MilitiaDuty.Data
 {
@@ -9,6 +10,8 @@ namespace MilitiaDuty.Data
         public DbSet<Militia> Militias { get; set; }
         public DbSet<DutyDate> DutyDates { get; set; }
         public DbSet<MilitiaDutyDate> MilitiaDutyDates { get; set; }
+        public DbSet<Rule> Rules { get; set; }
+        public DbSet<MilitiaRule> MilitiaRules { get; set; }
 
         public string DbPath { get; }
 
@@ -45,6 +48,24 @@ namespace MilitiaDuty.Data
                     md =>
                     {
                         md.HasKey(md => new { md.MilitiaId, md.DutyDateId });
+                    }
+                );
+
+            modelBuilder.Entity<Rule>()
+                .HasMany(r => r.Militias)
+                .WithMany(m => m.Rules)
+                .UsingEntity<MilitiaRule>(
+                    mr => mr
+                        .HasOne<Militia>()
+                        .WithMany()
+                        .HasForeignKey(mr => mr.MilitiaId),
+                    mr => mr
+                        .HasOne<Rule>()
+                        .WithMany()
+                        .HasForeignKey(mr => mr.RuleId),
+                    mr =>
+                    {
+                        mr.HasKey(mr => new { mr.MilitiaId, mr.RuleId });
                     }
                 );
         }
