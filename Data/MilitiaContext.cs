@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MilitiaDuty.Models.Assignments;
 using MilitiaDuty.Models.DutyDates;
 using MilitiaDuty.Models.Militias;
 using MilitiaDuty.Models.Rules;
@@ -12,6 +13,9 @@ namespace MilitiaDuty.Data
         public DbSet<MilitiaDutyDate> MilitiaDutyDates { get; set; }
         public DbSet<Rule> Rules { get; set; }
         public DbSet<MilitiaRule> MilitiaRules { get; set; }
+        public DbSet<Mission> Missions { get; set; }
+        public DbSet<Models.Assignments.Task> Tasks { get; set; }
+        public DbSet<RuleTask> RuleTasks { get; set; }
 
         public string DbPath { get; }
 
@@ -51,6 +55,7 @@ namespace MilitiaDuty.Data
                     }
                 );
 
+            // config many to many between Rule and Militia
             modelBuilder.Entity<Rule>()
                 .HasMany(r => r.Militias)
                 .WithMany(m => m.Rules)
@@ -66,6 +71,25 @@ namespace MilitiaDuty.Data
                     mr =>
                     {
                         mr.HasKey(mr => new { mr.MilitiaId, mr.RuleId });
+                    }
+                );
+
+            // config many to many between Rule and Task
+            modelBuilder.Entity<Rule>()
+                .HasMany(r => r.Tasks)
+                .WithMany(t => t.Rules)
+                .UsingEntity<RuleTask>(
+                    rt => rt
+                        .HasOne<Models.Assignments.Task>()
+                        .WithMany()
+                        .HasForeignKey(rt => rt.TaskId),
+                    rt => rt
+                        .HasOne<Rule>()
+                        .WithMany()
+                        .HasForeignKey(mr => mr.RuleId),
+                    rt =>
+                    {
+                        rt.HasKey(mr => new { mr.TaskId, mr.RuleId });
                     }
                 );
         }

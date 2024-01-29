@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MilitiaDuty.Data;
 
@@ -10,9 +11,11 @@ using MilitiaDuty.Data;
 namespace MilitiaDuty.Migrations
 {
     [DbContext(typeof(MilitiaContext))]
-    partial class MilitiaContextModelSnapshot : ModelSnapshot
+    [Migration("20240129141432_Add-Missions-Tasks")]
+    partial class AddMissionsTasks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.1");
@@ -144,21 +147,6 @@ namespace MilitiaDuty.Migrations
                     b.ToTable("Rules");
                 });
 
-            modelBuilder.Entity("MilitiaDuty.Models.Rules.RuleTask", b =>
-                {
-                    b.Property<uint>("TaskId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<uint>("RuleId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("TaskId", "RuleId");
-
-                    b.HasIndex("RuleId");
-
-                    b.ToTable("RuleTasks");
-                });
-
             modelBuilder.Entity("MilitiaDuty.Models.Assignments.Task", b =>
                 {
                     b.HasOne("MilitiaDuty.Models.Assignments.Mission", null)
@@ -194,21 +182,6 @@ namespace MilitiaDuty.Migrations
                     b.HasOne("MilitiaDuty.Models.Rules.Rule", null)
                         .WithMany()
                         .HasForeignKey("RuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("MilitiaDuty.Models.Rules.RuleTask", b =>
-                {
-                    b.HasOne("MilitiaDuty.Models.Rules.Rule", null)
-                        .WithMany()
-                        .HasForeignKey("RuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MilitiaDuty.Models.Assignments.Task", null)
-                        .WithMany()
-                        .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

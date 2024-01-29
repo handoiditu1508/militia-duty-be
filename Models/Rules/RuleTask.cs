@@ -2,7 +2,7 @@
 {
     public class RuleTask
     {
-        public int RuleId { get; set; }
-        public int TaskId { get; set; }
+        public uint RuleId { get; set; }
+        public uint TaskId { get; set; }
     }
 }
