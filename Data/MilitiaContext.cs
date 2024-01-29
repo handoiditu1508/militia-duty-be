@@ -16,6 +16,7 @@ namespace MilitiaDuty.Data
         public DbSet<Mission> Missions { get; set; }
         public DbSet<Models.Assignments.Task> Tasks { get; set; }
         public DbSet<RuleTask> RuleTasks { get; set; }
+        public DbSet<Shift> Shifts { get; set; }
 
         public string DbPath { get; }
 
