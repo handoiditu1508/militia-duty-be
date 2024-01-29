@@ -1,4 +1,5 @@
-﻿using MilitiaDuty.Models.Militias;
+﻿using MilitiaDuty.Models.Assignments;
+using MilitiaDuty.Models.Militias;
 
 namespace MilitiaDuty.Models.DutyDates
 {
@@ -9,5 +10,6 @@ namespace MilitiaDuty.Models.DutyDates
         public bool IsFullDutyDate { get; set; }
 
         public virtual ICollection<Militia> Militias { get; set; } = new List<Militia>();
+        public virtual ICollection<Shift> Shifts { get; set; } = new List<Shift>();
     }
 }
