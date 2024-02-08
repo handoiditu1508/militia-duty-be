@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MilitiaDuty.Models.Assignments;
 using MilitiaDuty.Models.DutyDates;
 using MilitiaDuty.Models.Militias;
@@ -92,6 +93,19 @@ namespace MilitiaDuty.Data
                     {
                         rt.HasKey(mr => new { mr.TaskId, mr.RuleId });
                     }
+                );
+
+            modelBuilder.Entity<Rule>()
+                .Property(r => r.WeekDays)
+                .HasConversion<string?>(
+                    weekDays => weekDays != null && weekDays.Any() ? string.Join(',', weekDays.ToArray()) : null,
+                    rawWeekDays => !string.IsNullOrWhiteSpace(rawWeekDays) ? rawWeekDays.Split(new[] { ',' }).Select(value => Enum.Parse<DayOfWeek>(value)) : null,
+                    new ValueComparer<IEnumerable<DayOfWeek>>(
+                        (weekDays1, weekDays2) => weekDays1 == weekDays2 || (weekDays1 != null && weekDays2 != null && weekDays1.SequenceEqual(weekDays2)),
+                        weekDays => weekDays.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                        weekDays => weekDays
+
+                    )
                 );
         }
     }
