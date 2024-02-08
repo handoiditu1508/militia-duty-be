@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MilitiaDuty.Data;
 
@@ -10,9 +11,11 @@ using MilitiaDuty.Data;
 namespace MilitiaDuty.Migrations
 {
     [DbContext(typeof(MilitiaContext))]
-    partial class MilitiaContextModelSnapshot : ModelSnapshot
+    [Migration("20240208083349_Update_TaskRule_Rename")]
+    partial class Update_TaskRule_Rename
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.1");

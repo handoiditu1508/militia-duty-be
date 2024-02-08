@@ -16,7 +16,7 @@ namespace MilitiaDuty.Data
         public DbSet<MilitiaRule> MilitiaRules { get; set; }
         public DbSet<Mission> Missions { get; set; }
         public DbSet<Models.Assignments.Task> Tasks { get; set; }
-        public DbSet<RuleTask> RuleTasks { get; set; }
+        public DbSet<TaskRule> TaskRules { get; set; }
         public DbSet<Shift> Shifts { get; set; }
 
         public string DbPath { get; }
@@ -80,7 +80,7 @@ namespace MilitiaDuty.Data
             modelBuilder.Entity<Rule>()
                 .HasMany(r => r.Tasks)
                 .WithMany(t => t.Rules)
-                .UsingEntity<RuleTask>(
+                .UsingEntity<TaskRule>(
                     rt => rt
                         .HasOne<Models.Assignments.Task>()
                         .WithMany()
