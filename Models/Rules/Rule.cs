@@ -6,7 +6,7 @@ namespace MilitiaDuty.Models.Rules
     {
         public uint Id { get; set; }
         public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public RuleType Type { get; set; }
         public string? Description { get; set; }
         public IEnumerable<DayOfWeek>? WeekDays { get; set; }
