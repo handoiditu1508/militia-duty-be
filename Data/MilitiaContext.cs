@@ -96,15 +96,14 @@ namespace MilitiaDuty.Data
                 );
 
             modelBuilder.Entity<Rule>()
-                .Property(r => r.WeekDays)
+                .Property(r => r.Weekdays)
                 .HasConversion<string?>(
-                    weekDays => weekDays != null && weekDays.Any() ? string.Join(',', weekDays.ToArray()) : null,
-                    rawWeekDays => !string.IsNullOrWhiteSpace(rawWeekDays) ? rawWeekDays.Split(new[] { ',' }).Select(value => Enum.Parse<DayOfWeek>(value)) : null,
+                    weekdays => weekdays != null && weekdays.Any() ? string.Join(',', weekdays.ToArray()) : null,
+                    rawWeekdays => !string.IsNullOrWhiteSpace(rawWeekdays) ? rawWeekdays.Split(new[] { ',' }).Select(value => Enum.Parse<DayOfWeek>(value)) : null,
                     new ValueComparer<IEnumerable<DayOfWeek>>(
-                        (weekDays1, weekDays2) => weekDays1 == weekDays2 || (weekDays1 != null && weekDays2 != null && weekDays1.SequenceEqual(weekDays2)),
-                        weekDays => weekDays.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                        weekDays => weekDays
-
+                        (weekdays1, weekdays2) => weekdays1 == weekdays2 || (weekdays1 != null && weekdays2 != null && weekdays1.SequenceEqual(weekdays2)),
+                        weekdays => weekdays.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                        weekdays => weekdays
                     )
                 );
         }
