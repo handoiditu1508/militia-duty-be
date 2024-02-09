@@ -10,7 +10,7 @@ namespace MilitiaDuty.Models.Rules
         public RuleType Type { get; set; }
         public string? Description { get; set; }
         public IEnumerable<DayOfWeek>? Weekdays { get; set; }
-        public ushort? NumberValue { get; set; }
+        public float? NumberValue { get; set; }
 
         public virtual ICollection<Militia> Militias { get; set; } = new List<Militia>();
         public virtual ICollection<Assignments.Task> Tasks { get; set; } = new List<Assignments.Task>();
