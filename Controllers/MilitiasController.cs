@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MilitiaDuty.Data;
+using MilitiaDuty.Models.Dtos;
 using MilitiaDuty.Models.Militias;
 
 namespace MilitiaDuty.Controllers
@@ -10,22 +12,26 @@ namespace MilitiaDuty.Controllers
     public class MilitiasController : ControllerBase
     {
         private readonly MilitiaContext _context;
+        private readonly IMapper _mapper;
 
-        public MilitiasController(MilitiaContext context)
+        public MilitiasController(MilitiaContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Militias
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Militia>>> GetMilitias()
+        public async Task<ActionResult<IEnumerable<MilitiaDto>>> GetMilitias()
         {
-            return await _context.Militias.ToListAsync();
+            var militias = await _context.Militias.ToListAsync();
+
+            return Ok(_mapper.Map<IEnumerable<MilitiaDto>>(militias));
         }
 
         // GET: api/Militias/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Militia>> GetMilitia(uint id)
+        public async Task<ActionResult<MilitiaDto>> GetMilitia(uint id)
         {
             var militia = await _context.Militias.FindAsync(id);
 
@@ -34,14 +40,16 @@ namespace MilitiaDuty.Controllers
                 return NotFound();
             }
 
-            return militia;
+            return _mapper.Map<MilitiaDto>(militia);
         }
 
         // PUT: api/Militias/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMilitia(uint id, Militia militia)
+        public async Task<IActionResult> PutMilitia(uint id, MilitiaDto militiaDto)
         {
+            var militia = _mapper.Map<Militia>(militiaDto);
+
             if (id != militia.Id)
             {
                 return BadRequest();
@@ -71,12 +79,14 @@ namespace MilitiaDuty.Controllers
         // POST: api/Militias
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Militia>> PostMilitia(Militia militia)
+        public async Task<ActionResult<MilitiaDto>> PostMilitia(MilitiaDto militiaDto)
         {
+            var militia = _mapper.Map<Militia>(militiaDto);
+
             _context.Militias.Add(militia);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetMilitia), new { id = militia.Id }, militia);
+            return CreatedAtAction(nameof(GetMilitia), new { id = militia.Id }, _mapper.Map<MilitiaDto>(militia));
         }
 
         // DELETE: api/Militias/5

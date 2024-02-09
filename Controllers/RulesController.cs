@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MilitiaDuty.Data;
+using MilitiaDuty.Models.Dtos;
 using MilitiaDuty.Models.Rules;
 
 namespace MilitiaDuty.Controllers
@@ -10,38 +12,49 @@ namespace MilitiaDuty.Controllers
     public class RulesController : ControllerBase
     {
         private readonly MilitiaContext _context;
+        private readonly IMapper _mapper;
 
-        public RulesController(MilitiaContext context)
+        public RulesController(MilitiaContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Rules
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Rule>>> GetRules()
+        public async Task<ActionResult<IEnumerable<RuleDto>>> GetRules()
         {
-            return await _context.Rules.ToListAsync();
+            var rules = await _context.Rules
+                .Include(r => r.Militias)
+                .Include(r => r.Tasks)
+                .ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<RuleDto>>(rules));
         }
 
         // GET: api/Rules/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Rule>> GetRule(uint id)
+        public async Task<ActionResult<RuleDto>> GetRule(uint id)
         {
-            var rule = await _context.Rules.FindAsync(id);
+            var rule = await _context.Rules
+                .Include(r => r.Militias)
+                .Include(r => r.Tasks)
+                .FirstOrDefaultAsync(r => r.Id == id);
 
             if (rule == null)
             {
                 return NotFound();
             }
 
-            return rule;
+            return _mapper.Map<RuleDto>(rule);
         }
 
         // PUT: api/Rules/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRule(uint id, Rule rule)
+        public async Task<IActionResult> PutRule(uint id, RuleDto ruleDto)
         {
+            var rule = _mapper.Map<Rule>(ruleDto);
+
             if (id != rule.Id)
             {
                 return BadRequest();
@@ -71,8 +84,10 @@ namespace MilitiaDuty.Controllers
         // POST: api/Rules
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Rule>> PostRule(Rule rule)
+        public async Task<ActionResult<RuleDto>> PostRule(RuleDto ruleDto)
         {
+            var rule = _mapper.Map<Rule>(ruleDto);
+
             _context.Rules.Add(rule);
             await _context.SaveChangesAsync();
 

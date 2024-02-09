@@ -1,4 +1,5 @@
 using MilitiaDuty.Data;
+using MilitiaDuty.Models;
 using MilitiaDuty.Models.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MilitiaContext>();
 
 builder.Services.Configure<MilitiaOptions>(builder.Configuration.GetRequiredSection(MilitiaOptions.Militia));
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

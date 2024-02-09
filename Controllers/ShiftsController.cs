@@ -20,14 +20,20 @@ namespace MilitiaDuty.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Shift>>> GetShift()
         {
-            return await _context.Shifts.ToListAsync();
+            return await _context.Shifts
+                .Include(s => s.Militia)
+                .Include(s => s.DutyDate)
+                .ToListAsync();
         }
 
         // GET: api/Shifts/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Shift>> GetShift(ulong id)
         {
-            var shift = await _context.Shifts.FindAsync(id);
+            var shift = await _context.Shifts
+                .Include(s => s.Militia)
+                .Include(s => s.DutyDate)
+                .FirstOrDefaultAsync(s => s.Id == id);
 
             if (shift == null)
             {
