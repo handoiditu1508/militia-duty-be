@@ -3,15 +3,17 @@
     public enum RuleType
     {
         /// <summary>
-        /// Off on a specific date (affect onDutyScore)
+        /// Off on a specific date (affect onDutyScore).
         /// </summary>
         DateOff,
         /// <summary>
-        /// On duty on a specific date (affect onDutyScore)
+        /// On duty on a specific date (affect onDutyScore).
         /// </summary>
         DutyDate,
         /// <summary>
-        /// Only on duty on specific days of week (not affect onDutyScore)
+        /// Only on duty on specific days of week (not affect onDutyScore).
+        /// Conflict with other duty rules.
+        /// A militia should not has more than one of this rule.
         /// </summary>
         WeeklyDutyOnly,
         /// <summary>
@@ -19,13 +21,11 @@
         /// </summary>
         FullDuty,
         /// <summary>
-        /// Two or more militias can not all off on a same date
+        /// Militias will alternatingly take duty each day.
+        /// Conflict with other duty rules.
+        /// A militia should not has more than one of this rule.
         /// </summary>
-        NoAllOff,
-        /// <summary>
-        /// Override default OnDutyRate (not affect onDutyScore)
-        /// </summary>
-        OnDutyRate,
+        AlternatingDuty,
         /// <summary>
         /// Only do specific tasks (affect AssignmentScore)
         /// </summary>

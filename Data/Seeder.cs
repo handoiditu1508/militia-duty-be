@@ -309,8 +309,8 @@ namespace MilitiaDuty.Data
                 {
                     Id = 2,
                     StartDate = new DateTime(2024, 1, 1),
-                    Type = RuleType.NoAllOff,
-                    Description = "a trưởng và a phó ko dc off cùng ngày"
+                    Type = RuleType.AlternatingDuty,
+                    Description = "Thay nhau trực 1 nghỉ 1"
                 },
                 new()
                 {
@@ -318,14 +318,6 @@ namespace MilitiaDuty.Data
                     StartDate = new DateTime(2024, 2, 15),
                     Type = RuleType.DateOff,
                     Description = "Khôi off ngày 15-2"
-                },
-                new()
-                {
-                    Id = 4,
-                    StartDate = new DateTime(2024, 1, 1),
-                    Type = RuleType.OnDutyRate,
-                    NumberValue = 1,
-                    Description = "trực 1 nghỉ 1"
                 }
             );
 
@@ -333,9 +325,7 @@ namespace MilitiaDuty.Data
                 new() { RuleId = 1, MilitiaId = 18 },
                 new() { RuleId = 2, MilitiaId = 5 },
                 new() { RuleId = 2, MilitiaId = 19 },
-                new() { RuleId = 3, MilitiaId = 9 },
-                new() { RuleId = 4, MilitiaId = 5 },
-                new() { RuleId = 4, MilitiaId = 19 }
+                new() { RuleId = 3, MilitiaId = 9 }
             );
         }
 
