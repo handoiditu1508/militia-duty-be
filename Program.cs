@@ -4,6 +4,19 @@ using MilitiaDuty.Models.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// CORS
+string _appCors = "AppCors";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(_appCors, policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .WithExposedHeaders("X-Total-Count");
+    });
+});
+
 // Add services to the container.
 builder.Services.AddDbContext<MilitiaContext>();
 
@@ -31,6 +44,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(_appCors);
 
 app.UseAuthorization();
 

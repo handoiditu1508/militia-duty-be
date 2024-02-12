@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MilitiaDuty.Data;
+using MilitiaDuty.Models.Dtos;
 using MilitiaDuty.Models.DutyDates;
 
 namespace MilitiaDuty.Controllers
@@ -10,25 +12,28 @@ namespace MilitiaDuty.Controllers
     public class ShiftsController : ControllerBase
     {
         private readonly MilitiaContext _context;
+        private readonly IMapper _mapper;
 
-        public ShiftsController(MilitiaContext context)
+        public ShiftsController(MilitiaContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Shifts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Shift>>> GetShift()
+        public async Task<ActionResult<IEnumerable<ShiftDto>>> GetShift()
         {
-            return await _context.Shifts
+            var shifts = await _context.Shifts
                 .Include(s => s.Militia)
                 .Include(s => s.DutyDate)
                 .ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<ShiftDto>>(shifts));
         }
 
         // GET: api/Shifts/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Shift>> GetShift(ulong id)
+        public async Task<ActionResult<ShiftDto>> GetShift(ulong id)
         {
             var shift = await _context.Shifts
                 .Include(s => s.Militia)
@@ -40,14 +45,16 @@ namespace MilitiaDuty.Controllers
                 return NotFound();
             }
 
-            return shift;
+            return _mapper.Map<ShiftDto>(shift);
         }
 
         // PUT: api/Shifts/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutShift(ulong id, Shift shift)
+        public async Task<IActionResult> PutShift(ulong id, TaskDto shiftDto)
         {
+            var shift = _mapper.Map<Shift>(shiftDto);
+
             if (id != shift.Id)
             {
                 return BadRequest();
@@ -77,12 +84,14 @@ namespace MilitiaDuty.Controllers
         // POST: api/Shifts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Shift>> PostShift(Shift shift)
+        public async Task<ActionResult<ShiftDto>> PostShift(ShiftDto shiftDto)
         {
+            var shift = _mapper.Map<Shift>(shiftDto);
+
             _context.Shifts.Add(shift);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetShift), new { id = shift.Id }, shift);
+            return CreatedAtAction(nameof(GetShift), new { id = shift.Id }, _mapper.Map<ShiftDto>(shift));
         }
 
         // DELETE: api/Shifts/5
