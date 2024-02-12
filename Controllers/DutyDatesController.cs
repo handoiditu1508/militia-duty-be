@@ -365,7 +365,7 @@ namespace MilitiaDuty.Controllers
                             }
 
                             // assign task to militia
-                            dutyDate.Shifts.Add(new Models.Assignments.Shift
+                            dutyDate.Shifts.Add(new Shift
                             {
                                 DutyDateId = dutyDate.Id,
                                 MilitiaId = militia.Id,
@@ -410,7 +410,7 @@ namespace MilitiaDuty.Controllers
                             }
 
                             // assign task to militia
-                            dutyDate.Shifts.Add(new Models.Assignments.Shift
+                            dutyDate.Shifts.Add(new Shift
                             {
                                 DutyDateId = dutyDate.Id,
                                 MilitiaId = militia.Id,
@@ -445,7 +445,7 @@ namespace MilitiaDuty.Controllers
                         militiaIndex++;
 
                         // assign task to militia
-                        dutyDate.Shifts.Add(new Models.Assignments.Shift
+                        dutyDate.Shifts.Add(new Shift
                         {
                             DutyDateId = dutyDate.Id,
                             MilitiaId = militia.Id,

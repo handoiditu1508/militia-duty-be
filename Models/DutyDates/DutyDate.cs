@@ -1,5 +1,4 @@
-﻿using MilitiaDuty.Models.Assignments;
-using MilitiaDuty.Models.Militias;
+﻿using MilitiaDuty.Models.Militias;
 
 namespace MilitiaDuty.Models.DutyDates
 {

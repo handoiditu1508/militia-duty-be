@@ -1,7 +1,6 @@
-﻿using MilitiaDuty.Models.DutyDates;
-using MilitiaDuty.Models.Militias;
+﻿using MilitiaDuty.Models.Militias;
 
-namespace MilitiaDuty.Models.Assignments
+namespace MilitiaDuty.Models.DutyDates
 {
     public class Shift
     {
@@ -9,7 +8,7 @@ namespace MilitiaDuty.Models.Assignments
         public required string DutyDateId { get; set; }
         public DutyDate? DutyDate { get; set; }
         public uint TaskId { get; set; }
-        public Task? Task { get; set; }
+        public Assignments.Task? Task { get; set; }
         public uint MilitiaId { get; set; }
         public Militia? Militia { get; set; }
     }

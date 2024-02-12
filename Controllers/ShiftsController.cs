@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MilitiaDuty.Data;
-using MilitiaDuty.Models.Assignments;
+using MilitiaDuty.Models.DutyDates;
 
 namespace MilitiaDuty.Controllers
 {
