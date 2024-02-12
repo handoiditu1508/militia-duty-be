@@ -102,7 +102,7 @@ namespace MilitiaDuty.Controllers
 
         // POST: api/DutyDates
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+        /*[HttpPost]
         public async Task<ActionResult<DutyDateDto>> PostDutyDate(DutyDate dutyDateDto)
         {
             var dutyDate = _mapper.Map<DutyDate>(dutyDateDto);
@@ -125,10 +125,10 @@ namespace MilitiaDuty.Controllers
             }
 
             return CreatedAtAction(nameof(GetDutyDate), new { id = dutyDate.Id }, _mapper.Map<DutyDateDto>(dutyDate));
-        }
+        }*/
 
         // DELETE: api/DutyDates/5
-        [HttpDelete("{id}")]
+        /*[HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDutyDate(string id)
         {
             var dutyDate = await _context.DutyDates.FindAsync(id);
@@ -141,14 +141,14 @@ namespace MilitiaDuty.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
+        }*/
 
         private bool DutyDateExists(string id)
         {
             return _context.DutyDates.Any(e => e.Id == id);
         }
 
-        [HttpPost(nameof(Do))]
+        [HttpPost]
         public async Task<ActionResult<IEnumerable<DutyDateDto>>> Do(DoDutyDatesRequest request)
         {
             var activeMilitias = await _context.Militias
@@ -172,7 +172,7 @@ namespace MilitiaDuty.Controllers
             return Ok(dutyDates);
         }
 
-        [HttpDelete(nameof(Undo))]
+        [HttpDelete]
         public async Task<IActionResult> Undo([FromQuery] UndoDutyDateRequest request)
         {
             var activeMilitias = await _context.Militias
