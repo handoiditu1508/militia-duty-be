@@ -34,7 +34,8 @@ namespace MilitiaDuty.Controllers
         {
             IQueryable<DutyDate> dutyDates = _context.DutyDates
                 .Include(d => d.Militias)
-                .Include(d => d.Shifts);
+                .Include(d => d.Shifts)
+                    .ThenInclude(s => s.Militia);
 
             if (filter.StartDate != null)
             {
@@ -57,6 +58,7 @@ namespace MilitiaDuty.Controllers
             var dutyDate = await _context.DutyDates
                 .Include(d => d.Militias)
                 .Include(d => d.Shifts)
+                    .ThenInclude(s => s.Militia)
                 .FirstOrDefaultAsync(d => d.Id == id);
 
             if (dutyDate == null)
