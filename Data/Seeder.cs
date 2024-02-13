@@ -37,10 +37,10 @@ namespace MilitiaDuty.Data
                 new() { Id = 2, Name = "Danh nhỏ", DutyDateScore = options.OnDutyRate * 3 },
                 new() { Id = 3, Name = "Minh", DutyDateScore = options.OnDutyRate * 2 },
                 new() { Id = 4, Name = "Châu", DutyDateScore = options.OnDutyRate },
-                new() { Id = 5, Name = "Thắng", DutyDateScore = options.OnDutyRate },
+                new() { Id = 5, Name = "Thắng" },
                 new() { Id = 6, Name = "Đạt", DutyDateScore = options.OnDutyRate },
                 new() { Id = 7, Name = "Thịnh", DutyDateScore = options.OnDutyRate },
-                new() { Id = 8, Name = "Long", DutyDateScore = options.OnDutyRate * 4 },
+                new() { Id = 8, Name = "Long", DutyDateScore = options.OnDutyRate * 2 },
                 new() { Id = 9, Name = "Khôi", DutyDateScore = options.OnDutyRate * 2 },
                 new() { Id = 10, Name = "Hưng", DutyDateScore = options.OnDutyRate * 2 },
                 new() { Id = 11, Name = "Phước", DutyDateScore = options.OnDutyRate * 2 },
@@ -51,9 +51,9 @@ namespace MilitiaDuty.Data
                 new() { Id = 16, Name = "Thành", DutyDateScore = options.OnDutyRate * 5 },
                 new() { Id = 17, Name = "Lộc", DutyDateScore = options.OnDutyRate * 4 },
                 new() { Id = 18, Name = "Phúc" },
-                new() { Id = 19, Name = "Danh lớn", DutyDateScore = options.OnDutyRate * 3 },
+                new() { Id = 19, Name = "Danh lớn" },
                 new() { Id = 20, Name = "An", DutyDateScore = options.OnDutyRate * 3 },
-                new() { Id = 21, Name = "Tùng", DutyDateScore = options.OnDutyRate * 4 },
+                new() { Id = 21, Name = "Tùng", DutyDateScore = options.OnDutyRate * 2 },
                 new() { Id = 22, Name = "Nghĩa", DutyDateScore = options.OnDutyRate * 3 },
                 new() { Id = 23, Name = "Dũng", DutyDateScore = options.OnDutyRate * 3 },
                 new() { Id = 24, Name = "Đại" }
@@ -313,6 +313,7 @@ namespace MilitiaDuty.Data
                 {
                     Id = 3,
                     StartDate = new DateTime(2024, 2, 15),
+                    EndDate = new DateTime(2024, 2, 15),
                     Type = RuleType.DateOff,
                     Description = "Khôi off ngày 15-2"
                 }

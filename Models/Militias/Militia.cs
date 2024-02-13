@@ -8,7 +8,7 @@ namespace MilitiaDuty.Models.Militias
         public uint Id { get; set; }
         public required string Name { get; set; }
         public float DutyDateScore { get; set; }
-        public uint AssignmentScore { get; set; }
+        public int AssignmentScore { get; set; }
         public MilitiaStatus Status { get; set; }
 
         public virtual ICollection<DutyDate> DutyDates { get; set; } = new List<DutyDate>();

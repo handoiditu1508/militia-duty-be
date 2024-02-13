@@ -236,15 +236,15 @@ namespace MilitiaDuty.Controllers
                         }
                         break;
                     case RuleType.AlternatingDuty:
-                        var maxScore = rule.Militias.Max(m => m.DutyDateScore);
-                        if (militia.DutyDateScore < maxScore)
+                        var minScore = rule.Militias.Min(m => m.DutyDateScore);
+                        if (militia.DutyDateScore > minScore)
                         {
                             return false;
                         }
-                        if (militia.DutyDateScore == maxScore)
+                        if (militia.DutyDateScore == minScore)
                         {
-                            var maxScoreMilitias = rule.Militias.Where(m => m.DutyDateScore == maxScore);
-                            if (militia.Id != maxScoreMilitias.MinBy(m => m.Id)!.Id)
+                            var minScoreMilitias = rule.Militias.Where(m => m.DutyDateScore == minScore);
+                            if (militia.Id != minScoreMilitias.MinBy(m => m.Id)!.Id)
                             {
                                 return false;
                             }
@@ -368,9 +368,6 @@ namespace MilitiaDuty.Controllers
                             {
                                 // put militia on that duty date
                                 dutyDate.Militias.Add(militia);
-
-                                // add duty score
-                                militia.DutyDateScore++;
                             }
 
                             // assign task to militia
@@ -380,9 +377,6 @@ namespace MilitiaDuty.Controllers
                                 MilitiaId = militia.Id,
                                 TaskId = taskToAssign.Id,
                             });
-
-                            // add asignment score
-                            militia.AssignmentScore++;
 
                             assignedTasksCountDict[taskToAssign.Id]++;
 
@@ -416,9 +410,6 @@ namespace MilitiaDuty.Controllers
                             {
                                 // put militia on that duty date
                                 dutyDate.Militias.Add(militia);
-
-                                // add duty score
-                                militia.DutyDateScore++;
                             }
 
                             // assign task to militia
@@ -428,9 +419,6 @@ namespace MilitiaDuty.Controllers
                                 MilitiaId = militia.Id,
                                 TaskId = task.Id,
                             });
-
-                            // add asignment score
-                            militia.AssignmentScore++;
 
                             assignedTasksCountDict[task.Id]++;
 
@@ -464,9 +452,6 @@ namespace MilitiaDuty.Controllers
                             TaskId = task.Id,
                         });
 
-                        // add asignment score
-                        militia.AssignmentScore++;
-
                         assignedTasksCountDict[task.Id]++;
 
                         shiftCount--;
@@ -482,9 +467,6 @@ namespace MilitiaDuty.Controllers
                 {
                     // put militia on that duty date
                     dutyDate.Militias.Add(militia);
-
-                    // add duty score
-                    militia.DutyDateScore++;
                 }
             }
 
@@ -506,9 +488,6 @@ namespace MilitiaDuty.Controllers
                     {
                         // put militia on that duty date
                         dutyDate.Militias.Add(militia);
-
-                        // add duty score
-                        militia.DutyDateScore++;
                     }
                     else
                     {
@@ -522,10 +501,17 @@ namespace MilitiaDuty.Controllers
             {
                 if (dutyDate.Militias.Contains(militia))
                 {
-                    if (!dutyDate.Shifts.Any(s => s.MilitiaId == militia.Id))
+                    // add duty score
+                    militia.DutyDateScore++;
+                    if (dutyDate.Shifts.Any(s => s.MilitiaId == militia.Id))
+                    {
+                        // add asignment score
+                        militia.AssignmentScore++;
+                    }
+                    else if (!militia.Rules.Any(r => r.Type == RuleType.TaskImmune))
                     {
                         // decrease assignment score for militias on duty but don't have any shift
-                        militia.AssignmentScore -= 1;
+                        militia.AssignmentScore--;
                     }
                 }
                 else if (!isFullDutyDate)
@@ -593,7 +579,7 @@ namespace MilitiaDuty.Controllers
                     // decrease score for militias that suppose to be on duty that date
                     foreach (var militia in dutyDate.Militias)
                     {
-                        militia.DutyDateScore -= 1;
+                        militia.DutyDateScore--;
 
                         militiasDict2.Remove(militia.Id);
                     }
@@ -611,7 +597,7 @@ namespace MilitiaDuty.Controllers
                 // decrease score for militias that have shift on that date
                 foreach (var shift in dutyDate.Shifts)
                 {
-                    shift.Militia!.AssignmentScore -= 1;
+                    shift.Militia!.AssignmentScore--;
 
                     militiasDict.Remove(shift.Militia.Id);
                 }
@@ -619,7 +605,10 @@ namespace MilitiaDuty.Controllers
                 // readd score for militias that on duty that date but not have shift
                 foreach (var militia in militiasDict.Values)
                 {
-                    militia.AssignmentScore += 1;
+                    if (!militia.Rules.Any(r => r.Type == RuleType.TaskImmune))
+                    {
+                        militia.AssignmentScore++;
+                    }
                 }
 
                 _context.DutyDates.Remove(dutyDate);
