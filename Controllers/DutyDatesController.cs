@@ -37,13 +37,15 @@ namespace MilitiaDuty.Controllers
                 .Include(d => d.Shifts)
                     .ThenInclude(s => s.Militia);
 
-            if (filter.StartDate != null)
+            if (filter.StartDate.HasValue)
             {
+                filter.StartDate = filter.StartDate.Value.Date;
                 dutyDates = dutyDates.Where(d => d.Date >= filter.StartDate);
             }
 
             if (filter.EndDate != null)
             {
+                filter.EndDate = filter.EndDate.Value.Date;
                 dutyDates = dutyDates.Where(d => d.Date <= filter.EndDate);
             }
 
@@ -153,6 +155,9 @@ namespace MilitiaDuty.Controllers
         [HttpPost]
         public async Task<ActionResult<IEnumerable<DutyDateDto>>> Do(DoDutyDatesRequest request)
         {
+            request.StartDate = request.StartDate.Date;
+            request.EndDate = request.EndDate.Date;
+
             var activeMilitias = await _context.Militias
                 .Include(m => m.Rules)
                     .ThenInclude(r => r.Tasks)
@@ -164,7 +169,7 @@ namespace MilitiaDuty.Controllers
 
             var todayTasks = await _context.Tasks.Where(t => t.Mission!.Status == Models.Assignments.MissionStatus.Actice).ToListAsync();
             var dutyDates = new List<DutyDateDto>();
-            for (var date = request.StartDate.Date; date <= request.EndDate.Date; date = date.AddDays(1))
+            for (var date = request.StartDate; date <= request.EndDate; date = date.AddDays(1))
             {
                 var dutyDate = AssignTasks(date, activeMilitias, todayTasks, militiaRatesDict, request.IsFullDutyDate);
 
@@ -213,9 +218,9 @@ namespace MilitiaDuty.Controllers
             date = date.Date;
 
             var activeRules = militia.Rules.Where(r =>
-                r.StartDate.Date == date ||
-                (r.StartDate.Date < date && !r.EndDate.HasValue) ||
-                (r.StartDate.Date < date && r.EndDate.HasValue && r.EndDate.Value.Date >= date)
+                r.StartDate == date ||
+                (r.StartDate < date && !r.EndDate.HasValue) ||
+                (r.StartDate < date && r.EndDate.HasValue && r.EndDate.Value >= date)
             );
 
             foreach (var rule in activeRules)
@@ -256,9 +261,9 @@ namespace MilitiaDuty.Controllers
             date = date.Date;
 
             var activeRules = militia.Rules.Where(r =>
-                r.StartDate.Date == date ||
-                (r.StartDate.Date < date && !r.EndDate.HasValue) ||
-                (r.StartDate.Date < date && r.EndDate.HasValue && r.EndDate.Value.Date >= date)
+                r.StartDate == date ||
+                (r.StartDate < date && !r.EndDate.HasValue) ||
+                (r.StartDate < date && r.EndDate.HasValue && r.EndDate.Value >= date)
             );
 
             foreach (var rule in activeRules)
@@ -306,7 +311,8 @@ namespace MilitiaDuty.Controllers
             // shuffle & order by dutyDateScore
             IEnumerable<Militia> militiasList = dutyableMilitias
                 .OrderBy(m => Random.Shared.Next())
-                .OrderBy(m => m.DutyDateScore);
+                .OrderBy(m => m.DutyDateScore)
+                .ToList();
 
             // count all shifts to assign
             var shiftCount = (int)tasks.Sum(m => m.MilitiaNumber);
@@ -324,6 +330,7 @@ namespace MilitiaDuty.Controllers
 
                 // make a dictionary of what tasks a militia able to handle
                 var militiaTasksDict = prioritizedMilitias.ToDictionary(m => m.Id, m => new List<Models.Assignments.Task>());
+                var testList = prioritizedMilitias.Select(m => m.Id).ToList();
                 // make a dictionary of how many militias can approriately assign to a task
                 var taskMilitiasCountDict = tasks.ToDictionary(t => t.Id, t => 0);
 
@@ -332,9 +339,9 @@ namespace MilitiaDuty.Controllers
                     foreach (var task in tasks)
                     {
                         var activeRules = militia.Rules.Where(r =>
-                            r.StartDate.Date == date ||
-                            (r.StartDate.Date < date && !r.EndDate.HasValue) ||
-                            (r.StartDate.Date < date && r.EndDate.HasValue && r.EndDate.Value.Date >= date)
+                            r.StartDate == date ||
+                            (r.StartDate < date && !r.EndDate.HasValue) ||
+                            (r.StartDate < date && r.EndDate.HasValue && r.EndDate.Value >= date)
                         );
                         if (CanMilitiaTakeTask(militia, activeRules, task))
                         {
@@ -345,7 +352,7 @@ namespace MilitiaDuty.Controllers
                 }
 
                 // order prioritizedMilitias by task count
-                prioritizedMilitias = prioritizedMilitias.OrderBy(m => militiaTasksDict[m.Id].Count);
+                prioritizedMilitias = prioritizedMilitias.OrderBy(m => militiaTasksDict[m.Id].Count).ToList();
 
                 foreach (var militia in prioritizedMilitias)
                 {
@@ -380,6 +387,8 @@ namespace MilitiaDuty.Controllers
                             assignedTasksCountDict[taskToAssign.Id]++;
 
                             shiftCount--;
+
+                            break;
                         }
                     }
                 }
@@ -393,7 +402,8 @@ namespace MilitiaDuty.Controllers
                 // order militias by duty score
                 var unassignedMilitias = dutyableMilitias
                     .Where(m => !dutyDate.Militias.Contains(m))
-                    .OrderBy(m => m.DutyDateScore);
+                    .OrderBy(m => m.DutyDateScore)
+                    .ToList();
 
                 foreach (var militia in unassignedMilitias)
                 {
@@ -487,7 +497,8 @@ namespace MilitiaDuty.Controllers
                 // order militias by duty score
                 var unassignedMilitias = dutyableMilitias
                     .Where(m => !dutyDate.Militias.Contains(m))
-                    .OrderBy(m => m.DutyDateScore);
+                    .OrderBy(m => m.DutyDateScore)
+                    .ToList();
 
                 foreach (var militia in unassignedMilitias)
                 {

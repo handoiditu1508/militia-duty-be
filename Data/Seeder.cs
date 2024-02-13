@@ -13,19 +13,19 @@ namespace MilitiaDuty.Data
             await context.Database.EnsureCreatedAsync();
 
             SeedMilitias(context, options);
-            await context.SaveChangesAsync();
-            SeedDutyDates(context);
-            await context.SaveChangesAsync();
+            //await context.SaveChangesAsync();
+            //SeedDutyDates(context);
+            //await context.SaveChangesAsync();
             SeedRules(context);
-            await context.SaveChangesAsync();
+            //await context.SaveChangesAsync();
             SeedMissions(context);
-            await context.SaveChangesAsync();
+            //await context.SaveChangesAsync();
             SeedTasks(context);
-            await context.SaveChangesAsync();
-            SeedShifts(context);
-            await context.SaveChangesAsync();
+            //await context.SaveChangesAsync();
+            //SeedShifts(context);
+            //await context.SaveChangesAsync();
             SeedTaskRules(context);
-            await context.SaveChangesAsync();
+            //await context.SaveChangesAsync();
 
             await context.SaveChangesAsync();
         }
