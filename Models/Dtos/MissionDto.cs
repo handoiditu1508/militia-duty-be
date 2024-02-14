@@ -8,6 +8,6 @@ namespace MilitiaDuty.Models.Dtos
         public required string Name { get; set; }
         public MissionStatus Status { get; set; }
 
-        public required IEnumerable<TaskDto> Tasks { get; set; }
+        public IEnumerable<TaskDto> Tasks { get; set; } = new List<TaskDto>();
     }
 }

@@ -88,10 +88,21 @@ namespace MilitiaDuty.Controllers
         {
             var rule = _mapper.Map<Rule>(ruleDto);
 
+            foreach (var militia in rule.Militias)
+            {
+                _context.Attach(militia);
+            }
+
+            foreach (var task in rule.Tasks)
+            {
+                _context.Attach(task);
+            }
+
             _context.Rules.Add(rule);
+
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetRule), new { id = rule.Id }, rule);
+            return CreatedAtAction(nameof(GetRule), new { id = rule.Id }, _mapper.Map<RuleDto>(rule));
         }
 
         // DELETE: api/Rules/5

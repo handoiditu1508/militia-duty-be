@@ -12,7 +12,7 @@ namespace MilitiaDuty.Models.Dtos
         public IEnumerable<DayOfWeek>? Weekdays { get; set; }
         public float? NumberValue { get; set; }
 
-        public required IEnumerable<MilitiaDto> Militias { get; set; }
-        public required IEnumerable<TaskDto> Tasks { get; set; }
+        public IEnumerable<MilitiaDto> Militias { get; set; } = new List<MilitiaDto>();
+        public IEnumerable<TaskDto> Tasks { get; set; } = new List<TaskDto>();
     }
 }

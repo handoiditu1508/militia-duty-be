@@ -6,7 +6,7 @@
         public DateTime Date { get; set; }
         public bool IsFullDutyDate { get; set; }
 
-        public required IEnumerable<MilitiaDto> Militias { get; set; }
-        public required IEnumerable<ShiftDto> Shifts { get; set; }
+        public IEnumerable<MilitiaDto> Militias { get; set; } = new List<MilitiaDto>();
+        public IEnumerable<ShiftDto> Shifts { get; set; } = new List<ShiftDto>();
     }
 }
