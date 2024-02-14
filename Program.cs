@@ -32,11 +32,11 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Seed database
-var options = app.Configuration.GetRequiredSection(MilitiaOptions.Militia).Get<MilitiaOptions>();
+/*var options = app.Configuration.GetRequiredSection(MilitiaOptions.Militia).Get<MilitiaOptions>();
 if (options != null)
 {
     await Seeder.Seed(options);
-}
+}*/
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

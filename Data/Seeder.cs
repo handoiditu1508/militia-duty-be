@@ -29,7 +29,7 @@ namespace MilitiaDuty.Data
                 new() { Id = 1, Name = "Hiếu", DutyDateScore = options.OnDutyRate * 2 },
                 new() { Id = 2, Name = "Danh nhỏ", DutyDateScore = options.OnDutyRate * 3 },
                 new() { Id = 3, Name = "Minh", DutyDateScore = options.OnDutyRate * 2 },
-                new() { Id = 4, Name = "Châu", DutyDateScore = options.OnDutyRate },
+                new() { Id = 4, Name = "Châu", DutyDateScore = options.OnDutyRate * 3 },
                 new() { Id = 5, Name = "Thắng" },
                 new() { Id = 6, Name = "Đạt", DutyDateScore = options.OnDutyRate },
                 new() { Id = 7, Name = "Thịnh", DutyDateScore = options.OnDutyRate },
@@ -49,7 +49,7 @@ namespace MilitiaDuty.Data
                 new() { Id = 21, Name = "Tùng", DutyDateScore = options.OnDutyRate * 2 },
                 new() { Id = 22, Name = "Nghĩa", DutyDateScore = options.OnDutyRate * 3 },
                 new() { Id = 23, Name = "Dũng", DutyDateScore = options.OnDutyRate * 3 },
-                new() { Id = 24, Name = "Đại" }
+                new() { Id = 24, Name = "Đại", DutyDateScore = options.OnDutyRate }
             );
         }
 
