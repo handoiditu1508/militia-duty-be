@@ -38,5 +38,9 @@
         /// Never take any task (not affect AssignmentScore)
         /// </summary>
         TaskImmune,
+        /// <summary>
+        /// Prioritize off days for specific days of week (affect AssignmentScore)
+        /// </summary>
+        PreferOffDays,
     }
 }

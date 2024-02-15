@@ -28,7 +28,8 @@ namespace MilitiaDuty.Controllers
                 .Include(r => r.Militias)
                 .Include(r => r.Tasks)
                 .ToListAsync();
-            return Ok(_mapper.Map<IEnumerable<RuleDto>>(rules));
+            var ruleDtos = _mapper.Map<IEnumerable<RuleDto>>(rules);
+            return Ok(ruleDtos);
         }
 
         // GET: api/Rules/5

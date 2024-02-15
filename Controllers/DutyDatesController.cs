@@ -230,7 +230,7 @@ namespace MilitiaDuty.Controllers
                     case RuleType.DateOff:
                         return false;
                     case RuleType.WeeklyDutyOnly:
-                        if (rule.Weekdays != null && rule.Weekdays.Contains(date.DayOfWeek))
+                        if (rule.Weekdays != null && !rule.Weekdays.Contains(date.DayOfWeek))
                         {
                             return false;
                         }
@@ -248,6 +248,12 @@ namespace MilitiaDuty.Controllers
                             {
                                 return false;
                             }
+                        }
+                        break;
+                    case RuleType.PreferOffDays:
+                        if (militia.DutyDateScore >= _options.OnDutyRate && rule.Weekdays != null && rule.Weekdays.Contains(date.DayOfWeek))
+                        {
+                            return false;
                         }
                         break;
                 }
