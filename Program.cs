@@ -22,7 +22,10 @@ builder.Services.AddDbContext<MilitiaContext>();
 
 builder.Services.Configure<MilitiaOptions>(builder.Configuration.GetRequiredSection(MilitiaOptions.Militia));
 
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddAutoMapper(e =>
+{
+    e.AllowNullCollections = true;
+}, typeof(MappingProfile));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
