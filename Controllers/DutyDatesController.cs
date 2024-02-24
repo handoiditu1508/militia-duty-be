@@ -343,12 +343,7 @@ namespace MilitiaDuty.Controllers
             {
                 foreach (var task in tasks)
                 {
-                    var activeRules = militia.Rules.Where(r =>
-                        r.StartDate == date ||
-                        (r.StartDate < date && !r.EndDate.HasValue) ||
-                        (r.StartDate < date && r.EndDate.HasValue && r.EndDate.Value >= date)
-                    );
-                    if (CanMilitiaTakeTask(militia, activeRules, task))
+                    if (CanMilitiaTakeTask(militia, task, date))
                     {
                         militiaTasksDict[militia.Id].Add(task);
                         taskMilitiasCountDict[task.Id]++;
@@ -428,7 +423,7 @@ namespace MilitiaDuty.Controllers
                     foreach (var task in tasks)
                     {
                         // check task still has available shift
-                        if (assignedTasksCountDict[task.Id] < task.MilitiaNumber)
+                        if (assignedTasksCountDict[task.Id] < task.MilitiaNumber && CanMilitiaTakeTask(militia, task, date))
                         {
                             if (!isFullDutyDate)
                             {
@@ -472,6 +467,9 @@ namespace MilitiaDuty.Controllers
                     {
                         var militia = militiasList2[militiaIndex % militiasList2.Count];
                         militiaIndex++;
+
+                        if (!CanMilitiaTakeTask(militia, task, date))
+                            continue;
 
                         // assign task to militia
                         dutyDate.Shifts.Add(new Shift
@@ -559,8 +557,14 @@ namespace MilitiaDuty.Controllers
             return dutyDate;
         }
 
-        private bool CanMilitiaTakeTask(Militia militia, IEnumerable<Rule> rules, Models.Assignments.Task task)
+        private bool CanMilitiaTakeTask(Militia militia, Models.Assignments.Task task, DateTime date)
         {
+            var rules = militia.Rules.Where(r =>
+                r.StartDate == date ||
+                (r.StartDate < date && !r.EndDate.HasValue) ||
+                (r.StartDate < date && r.EndDate.HasValue && r.EndDate.Value >= date)
+            );
+
             foreach (var rule in rules)
             {
                 switch (rule.Type)
