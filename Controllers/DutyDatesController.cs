@@ -570,13 +570,14 @@ namespace MilitiaDuty.Controllers
                 switch (rule.Type)
                 {
                     case RuleType.IncludeTasks:
-                        if (!rule.Tasks.Contains(task))
+                        if (!rule.Tasks.Contains(task)
+                            || (rule.Weekdays != null && !rule.Weekdays.Contains(date.DayOfWeek)))
                         {
                             return false;
                         }
                         break;
                     case RuleType.ExcludeTasks:
-                        if (rule.Tasks.Contains(task))
+                        if (rule.Tasks.Contains(task) && rule.Weekdays != null && rule.Weekdays.Contains(date.DayOfWeek))
                         {
                             return false;
                         }
