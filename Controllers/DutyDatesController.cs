@@ -270,7 +270,7 @@ namespace MilitiaDuty.Controllers
                 r.StartDate == date ||
                 (r.StartDate < date && !r.EndDate.HasValue) ||
                 (r.StartDate < date && r.EndDate.HasValue && r.EndDate.Value >= date)
-            );
+            ).ToList();
 
             foreach (var rule in activeRules)
             {
@@ -286,10 +286,10 @@ namespace MilitiaDuty.Controllers
                         }
                         break;
                     case RuleType.AlternatingDuty:
-                        var maxScore = rule.Militias.Max(m => m.DutyDateScore);
-                        if (militia.DutyDateScore == maxScore)
+                        var minScore = rule.Militias.Min(m => m.DutyDateScore);
+                        if (militia.DutyDateScore == minScore)
                         {
-                            var maxScoreMilitias = rule.Militias.Where(m => m.DutyDateScore == maxScore);
+                            var maxScoreMilitias = rule.Militias.Where(m => m.DutyDateScore == minScore);
                             if (militia.Id == maxScoreMilitias.MinBy(m => m.Id)!.Id)
                             {
                                 return true;
@@ -323,11 +323,20 @@ namespace MilitiaDuty.Controllers
             IEnumerable<Militia> dutyableMilitias = isFullDutyDate ? militias : militias.Where(m => CanMilitiaOnDuty(m, date)).ToList();
 
             // list of militias of this dutyDate
-            IEnumerable<Militia> militiasList = dutyableMilitias
+            var lesserScoreMilitias = dutyableMilitias
                 .OrderBy(m => Random.Shared.Next())// shuffle
                 .OrderBy(m => m.DutyDateScore)// order by dutyDateScore
-                .Take((int)_options.IdealMilitiaPerDate)// take ideal militia number
-                .ToList();
+                .Take((int)_options.IdealMilitiaPerDate)
+                .ToList();// take ideal militia number
+            List<Militia> militiasList = [.. lesserScoreMilitias];
+
+            // get forced militias
+            IEnumerable<Militia> forcedDutyMilitias = [];
+            if (!isFullDutyDate)
+            {
+                forcedDutyMilitias = dutyableMilitias.Where(m => IsForcedDuty(m, date)).ToList();
+                militiasList.AddRange(forcedDutyMilitias.Where(m => !militiasList.Contains(m)));
+            }
 
             // count all shifts to assign
             var shiftCount = (int)tasks.Sum(m => m.MilitiaNumber);
@@ -352,17 +361,30 @@ namespace MilitiaDuty.Controllers
             }
 
             // order militiasList by task count
-            militiasList = militiasList
-                .OrderBy(m => Random.Shared.Next())// shuffle
+            militiasList = forcedDutyMilitias
+                .OrderBy(m => Random.Shared.Next())
                 .OrderBy(m => m.AssignmentScore)
-                .ToList();
+                .Concat
+                (
+                    lesserScoreMilitias
+                        .Where(m => !forcedDutyMilitias.Contains(m))
+                        .OrderBy(m => Random.Shared.Next())// shuffle
+                        .OrderBy(m => m.AssignmentScore)
+                        .ToList()
+                ).ToList();
+
 
             foreach (var militia in militiasList)
             {
-                if (!isFullDutyDate)
+                if (!isFullDutyDate && forcedDutyMilitias.Contains(militia))
                 {
                     // put militia on that duty date
                     dutyDate.Militias.Add(militia);
+                }
+
+                if (dutyDate.Militias.Count >= _options.IdealMilitiaPerDate && shiftCount <= 0)
+                {
+                    continue;
                 }
 
                 // order militia's approriate tasks by how unlikely a task fit for a millitia
@@ -387,6 +409,12 @@ namespace MilitiaDuty.Controllers
                         assignedTasksCountDict[taskToAssign.Id]++;
 
                         shiftCount--;
+
+                        if (!isFullDutyDate && !forcedDutyMilitias.Contains(militia))
+                        {
+                            // put militia on that duty date
+                            dutyDate.Militias.Add(militia);
+                        }
 
                         break;
                     }
@@ -482,20 +510,6 @@ namespace MilitiaDuty.Controllers
                         assignedTasksCountDict[task.Id]++;
 
                         shiftCount--;
-                    }
-                }
-            }
-
-            // get forced militias
-            if (!isFullDutyDate)
-            {
-                var forcedDutyMilitias = dutyableMilitias.Where(m => IsForcedDuty(m, date)).ToList();
-                foreach (var militia in forcedDutyMilitias)
-                {
-                    if (!dutyDate.Militias.Contains(militia))
-                    {
-                        // put militia on that duty date
-                        dutyDate.Militias.Add(militia);
                     }
                 }
             }
