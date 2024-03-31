@@ -533,7 +533,10 @@ namespace MilitiaDuty.Controllers
                 if (dutyDate.Militias.Contains(militia))
                 {
                     // add duty score
-                    militia.DutyDateScore++;
+                    if (!militia.Rules.Any(r => r.Type == RuleType.FullDuty || r.Type == RuleType.WeeklyDutyOnly))
+                    {
+                        militia.DutyDateScore++;
+                    }
                     if (dutyDate.Shifts.Any(s => s.MilitiaId == militia.Id))
                     {
                         // add asignment score
@@ -617,7 +620,10 @@ namespace MilitiaDuty.Controllers
                     // decrease score for militias that suppose to be on duty that date
                     foreach (var militia in dutyDate.Militias)
                     {
-                        militia.DutyDateScore--;
+                        if (!militia.Rules.Any(r => r.Type == RuleType.FullDuty || r.Type == RuleType.WeeklyDutyOnly))
+                        {
+                            militia.DutyDateScore--;
+                        }
 
                         militiasDict2.Remove(militia.Id);
                     }
