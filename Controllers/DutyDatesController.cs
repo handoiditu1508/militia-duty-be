@@ -256,6 +256,12 @@ namespace MilitiaDuty.Controllers
                             return false;
                         }
                         break;
+                    case RuleType.WeeklyOffDays:
+                        if (rule.Weekdays != null && rule.Weekdays.Contains(date.DayOfWeek))
+                        {
+                            return false;
+                        }
+                        break;
                 }
             }
 
@@ -376,10 +382,18 @@ namespace MilitiaDuty.Controllers
 
             foreach (var militia in militiasList)
             {
-                if (!isFullDutyDate && forcedDutyMilitias.Contains(militia))
+                if (militia.Id == 10)
                 {
-                    // put militia on that duty date
-                    dutyDate.Militias.Add(militia);
+                    var test = militia.Id;
+                }
+
+                if (!isFullDutyDate)
+                {
+                    if (forcedDutyMilitias.Contains(militia) || militia.Rules.Any(r => r.Type == RuleType.TaskImmune))
+                    {
+                        // put militia on that duty date
+                        dutyDate.Militias.Add(militia);
+                    }
                 }
 
                 if (dutyDate.Militias.Count >= _options.IdealMilitiaPerDate && shiftCount <= 0)

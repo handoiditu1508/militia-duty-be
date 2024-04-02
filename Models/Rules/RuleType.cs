@@ -42,5 +42,9 @@
         /// Prioritize off days for specific days of week (affect AssignmentScore)
         /// </summary>
         PreferOffDays,
+        /// <summary>
+        /// Ensure to be off on specific days in week
+        /// </summary>
+        WeeklyOffDays,
     }
 }
