@@ -341,8 +341,12 @@ namespace MilitiaDuty.Controllers
             if (!isFullDutyDate)
             {
                 forcedDutyMilitias = dutyableMilitias.Where(m => IsForcedDuty(m, date)).ToList();
-                militiasList.AddRange(forcedDutyMilitias.Where(m => !militiasList.Contains(m)));
             }
+            else
+            {
+                forcedDutyMilitias = dutyableMilitias;
+            }
+            militiasList.AddRange(forcedDutyMilitias.Where(m => !militiasList.Contains(m)));
 
             // count all shifts to assign
             var shiftCount = (int)tasks.Sum(m => m.MilitiaNumber);
@@ -558,7 +562,20 @@ namespace MilitiaDuty.Controllers
 
             foreach (var militia in militias)
             {
-                if (dutyDate.Militias.Contains(militia))
+                if (isFullDutyDate)
+                {
+                    if (dutyDate.Shifts.Any(s => s.MilitiaId == militia.Id))
+                    {
+                        // add asignment score
+                        militia.AssignmentScore++;
+                    }
+                    else if (!militia.Rules.Any(r => r.Type == RuleType.TaskImmune))
+                    {
+                        // decrease assignment score for militias on duty but don't have any shift
+                        militia.AssignmentScore--;
+                    }
+                }
+                else if (dutyDate.Militias.Contains(militia))
                 {
                     // add duty score
                     if (!militia.Rules.Any(r => r.Type == RuleType.FullDuty || r.Type == RuleType.WeeklyDutyOnly))
@@ -576,7 +593,7 @@ namespace MilitiaDuty.Controllers
                         militia.AssignmentScore--;
                     }
                 }
-                else if (!isFullDutyDate)
+                else
                 {
                     // decrease duty score for militia not on duty
                     militia.DutyDateScore -= militiaRatesDict[militia.Id];
@@ -632,11 +649,9 @@ namespace MilitiaDuty.Controllers
                 .ToListAsync();
 
             // get all active militias
-            var activeMilitias = existingDutyDates.Any(d => !d.IsFullDutyDate)
-                ? await _context.Militias
+            var activeMilitias = await _context.Militias
                     .Where(m => m.Status == MilitiaStatus.Actice)
-                    .ToListAsync()
-                : [];
+                    .ToListAsync();
 
             foreach (var dutyDate in existingDutyDates)
             {
@@ -664,7 +679,9 @@ namespace MilitiaDuty.Controllers
                 }
 
                 // make dictionary of all militias on duty that date
-                var militiasDict = dutyDate.Militias.ToDictionary(m => m.Id, m => m);
+                var militiasDict = !dutyDate.IsFullDutyDate
+                    ? dutyDate.Militias.ToDictionary(m => m.Id, m => m)
+                    : activeMilitias.ToDictionary(m => m.Id, m => m);
 
                 // decrease score for militias that have shift on that date
                 foreach (var shift in dutyDate.Shifts)
