@@ -163,14 +163,15 @@ namespace MilitiaDuty.Controllers
                     .ThenInclude(r => r.Tasks)
                 .Where(m => m.Status == MilitiaStatus.Actice)
                 .ToListAsync();
-            var militiaRatesDict = activeMilitias.ToDictionary(m => m.Id, m => GetMilitiaDutyRate(m.Rules));
 
-            await UndoAssignments(request.StartDate, request.EndDate, militiaRatesDict);
+            await UndoAssignments(request.StartDate, request.EndDate);
 
             var todayTasks = await _context.Tasks.Where(t => t.Mission!.Status == Models.Assignments.MissionStatus.Actice).ToListAsync();
             var dutyDates = new List<DutyDateDto>();
             for (var date = request.StartDate; date <= request.EndDate; date = date.AddDays(1))
             {
+                var militiaRatesDict = activeMilitias.ToDictionary(m => m.Id, m => GetMilitiaDutyRate(m.ActiveRules(date)));
+
                 var dutyDate = AssignTasks(date, activeMilitias, todayTasks, militiaRatesDict, request.IsFullDutyDate);
 
                 dutyDates.Add(_mapper.Map<DutyDateDto>(dutyDate));
@@ -187,9 +188,8 @@ namespace MilitiaDuty.Controllers
                     .ThenInclude(r => r.Tasks)
                 .Where(m => m.Status == MilitiaStatus.Actice)
                 .ToListAsync();
-            var militiaRatesDict = activeMilitias.ToDictionary(m => m.Id, m => GetMilitiaDutyRate(m.Rules));
 
-            await UndoAssignments(request.StartDate, request.EndDate, militiaRatesDict);
+            await UndoAssignments(request.StartDate, request.EndDate);
 
             return NoContent();
         }
@@ -217,11 +217,7 @@ namespace MilitiaDuty.Controllers
         {
             date = date.Date;
 
-            var activeRules = militia.Rules.Where(r =>
-                r.StartDate == date ||
-                (r.StartDate < date && !r.EndDate.HasValue) ||
-                (r.StartDate < date && r.EndDate.HasValue && r.EndDate.Value >= date)
-            );
+            var activeRules = militia.ActiveRules(date).ToList();
 
             foreach (var rule in activeRules)
             {
@@ -272,11 +268,7 @@ namespace MilitiaDuty.Controllers
         {
             date = date.Date;
 
-            var activeRules = militia.Rules.Where(r =>
-                r.StartDate == date ||
-                (r.StartDate < date && !r.EndDate.HasValue) ||
-                (r.StartDate < date && r.EndDate.HasValue && r.EndDate.Value >= date)
-            ).ToList();
+            var activeRules = militia.ActiveRules(date).ToList();
 
             foreach (var rule in activeRules)
             {
@@ -393,7 +385,7 @@ namespace MilitiaDuty.Controllers
 
                 if (!isFullDutyDate)
                 {
-                    if (forcedDutyMilitias.Contains(militia) || militia.Rules.Any(r => r.Type == RuleType.TaskImmune))
+                    if (forcedDutyMilitias.Contains(militia) || militia.ActiveRules(date).Any(r => r.Type == RuleType.TaskImmune))
                     {
                         // put militia on that duty date
                         dutyDate.Militias.Add(militia);
@@ -569,7 +561,7 @@ namespace MilitiaDuty.Controllers
                         // add asignment score
                         militia.AssignmentScore++;
                     }
-                    else if (!militia.Rules.Any(r => r.Type == RuleType.TaskImmune))
+                    else if (!militia.ActiveRules(date).Any(r => r.Type == RuleType.TaskImmune))
                     {
                         // decrease assignment score for militias on duty but don't have any shift
                         militia.AssignmentScore--;
@@ -578,7 +570,7 @@ namespace MilitiaDuty.Controllers
                 else if (dutyDate.Militias.Contains(militia))
                 {
                     // add duty score
-                    if (!militia.Rules.Any(r => r.Type == RuleType.FullDuty || r.Type == RuleType.WeeklyDutyOnly))
+                    if (!militia.ActiveRules(date).Any(r => r.Type == RuleType.FullDuty || r.Type == RuleType.WeeklyDutyOnly))
                     {
                         militia.DutyDateScore++;
                     }
@@ -587,7 +579,7 @@ namespace MilitiaDuty.Controllers
                         // add asignment score
                         militia.AssignmentScore++;
                     }
-                    else if (!militia.Rules.Any(r => r.Type == RuleType.TaskImmune))
+                    else if (!militia.ActiveRules(date).Any(r => r.Type == RuleType.TaskImmune))
                     {
                         // decrease assignment score for militias on duty but don't have any shift
                         militia.AssignmentScore--;
@@ -607,11 +599,7 @@ namespace MilitiaDuty.Controllers
 
         private bool CanMilitiaTakeTask(Militia militia, Models.Assignments.Task task, DateTime date)
         {
-            var rules = militia.Rules.Where(r =>
-                r.StartDate == date ||
-                (r.StartDate < date && !r.EndDate.HasValue) ||
-                (r.StartDate < date && r.EndDate.HasValue && r.EndDate.Value >= date)
-            );
+            var rules = militia.ActiveRules(date).ToList();
 
             foreach (var rule in rules)
             {
@@ -639,7 +627,7 @@ namespace MilitiaDuty.Controllers
             return true;
         }
 
-        private async Task UndoAssignments(DateTime startDate, DateTime endDate, IDictionary<uint, float> militiaRatesDict)
+        private async Task UndoAssignments(DateTime startDate, DateTime endDate)
         {
             // get dutyDates in range
             var existingDutyDates = await _context.DutyDates
@@ -656,6 +644,8 @@ namespace MilitiaDuty.Controllers
 
             foreach (var dutyDate in existingDutyDates)
             {
+                var militiaRatesDict = activeMilitias.ToDictionary(m => m.Id, m => GetMilitiaDutyRate(m.ActiveRules(dutyDate.Date)));
+
                 if (!dutyDate.IsFullDutyDate)
                 {
                     // make dictionary of all active militias
@@ -664,7 +654,7 @@ namespace MilitiaDuty.Controllers
                     // decrease score for militias that suppose to be on duty that date
                     foreach (var militia in dutyDate.Militias)
                     {
-                        if (!militia.Rules.Any(r => r.Type == RuleType.FullDuty || r.Type == RuleType.WeeklyDutyOnly))
+                        if (!militia.ActiveRules(dutyDate.Date).Any(r => r.Type == RuleType.FullDuty || r.Type == RuleType.WeeklyDutyOnly))
                         {
                             militia.DutyDateScore--;
                         }
@@ -695,7 +685,7 @@ namespace MilitiaDuty.Controllers
                 // readd score for militias that on duty that date but not have shift
                 foreach (var militia in militiasDict.Values)
                 {
-                    if (!militia.Rules.Any(r => r.Type == RuleType.TaskImmune))
+                    if (!militia.ActiveRules(dutyDate.Date).Any(r => r.Type == RuleType.TaskImmune))
                     {
                         militia.AssignmentScore++;
                     }
